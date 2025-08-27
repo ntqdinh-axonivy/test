@@ -15,19 +15,6 @@ jobs:
         env:
           ORG: axonivy-market
         run: |
-          # List all repos in the org
-          repos=$(gh repo list $ORG --limit 1000 --json name --jq '.[].name')
-
-          for repo in $repos; do
-            echo "🔎 Checking repo: $ORG/$repo"
-            
-            # Find all open PRs with title "Release" and author github-actions[bot]
-            prs=$(gh pr list \
-              --repo "$ORG/$repo" \
-              --search "Release in:title author:github-actions[bot]" \
-              --json number --jq '.[].number')
-
-            for pr in $prs; do
-              echo "➡️  Adding label B to $ORG/$repo PR #$pr"
-            done
-          done
+          prs=$(gh pr list --search "Release in:title author:github-actions[bot] user:axonivy-market" --json number,title,author)
+          echo "Raw JSON output:"
+          echo "$prs"
