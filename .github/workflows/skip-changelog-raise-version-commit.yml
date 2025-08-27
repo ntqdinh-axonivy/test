@@ -16,11 +16,19 @@ jobs:
           ORG: axonivy-market
         run: |
           repos=$(gh repo list $ORG --json name --jq '.[].name')
-            for repo in $repos; do
-              echo "🔍 Checking repo: $repo"
-              prs=$(gh pr list --repo "$ORG/$repo" --search "Release in:title author:github-actions[bot]" --json number,title,author)
+          for repo in $repos; do
+            echo "🔍 Checking repo: $repo"
+            prs=$(gh pr list \
+              --repo "$ORG/$repo" \
+              --state all \
+              --search "Release in:title author:github-actions[bot]" \
+              --json number,title,author,state,mergedAt)
 
-              if [ "$prs" != "[]" ]; then
-                echo "➡️ Found PRs in $repo: $prs"
-              fi
-            done
+            # Filter out only open or merged (skip closed)
+            filtered=$(echo "$prs" | jq '[.[] | select(.state=="OPEN" or .state=="MERGED")]')
+
+            if [ "$filtered" != "[]" ]; then
+              echo "➡️ Found PRs in $repo:"
+              echo "$filtered"
+            fi
+          done
