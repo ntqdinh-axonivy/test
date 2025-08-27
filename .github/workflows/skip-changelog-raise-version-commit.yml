@@ -15,6 +15,12 @@ jobs:
         env:
           ORG: axonivy-market
         run: |
-          prs=$(gh pr list --search "Release in:title author:github-actions[bot] user:axonivy-market" --json number,title,author)
-          echo "Raw JSON output:"
-          echo "$prs"
+          repos=$(gh repo list $ORG --json name --jq '.[].name')
+            for repo in $repos; do
+              echo "🔍 Checking repo: $repo"
+              prs=$(gh pr list --repo "$ORG/$repo" --search "Release in:title author:github-actions[bot]" --json number,title,author)
+
+              if [ "$prs" != "[]" ]; then
+                echo "➡️ Found PRs in $repo: $prs"
+              fi
+            done
