@@ -35,4 +35,4 @@ jobs:
           #       gh pr edit $number --repo "$ORG/$repo" --add-label "skip-changelog"
           #     fi
           #   done
-          # done
+          done
